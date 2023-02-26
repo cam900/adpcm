@@ -92,9 +92,6 @@ void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
 	for(i=0;i<len;i++)
 	{
 		int16_t sample = *buffer++;
-		if(sample < 0x7ff8) // round up
-			sample += 8;
-		sample >>= 4;
 		int step = ima_encode_step(sample, &history, &step_hist);
 		if(nibble)
 			*outbuffer++ = buf_sample | (step&15);
@@ -119,6 +116,6 @@ void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 		if(nibble)
 			buffer++;
 		nibble^=4;
-		*outbuffer++ = ima_step(step, &history, &step_hist) << 4;
+		*outbuffer++ = ima_step(step, &history, &step_hist);
 	}
 }

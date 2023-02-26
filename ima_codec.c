@@ -1,11 +1,6 @@
 /*
 	Encode and decode algorithms for
-	OKI ADPCM
-
-	Only difference between MSM6295 and MSM6258 is that the nibbles are swapped.
-	MSM6295 reads from MSB to LSB. MSM6258 reads from LSB to MSB.
-
-	Dialogic 'VOX' PCM reads from MSB to LSB, therefore should use the MSM6295 functions.
+	IMA ADPCM
 
 	2019-2022 by superctr.
 */

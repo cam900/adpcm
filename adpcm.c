@@ -7,6 +7,7 @@
 #include "yma_codec.h"
 #include "ymb_codec.h"
 #include "ymz_codec.h"
+#include "ima_codec.h"
 
 void encode(uint8_t *source,uint8_t *dest,long length,int adpcm_mode)
 {
@@ -24,6 +25,8 @@ void encode(uint8_t *source,uint8_t *dest,long length,int adpcm_mode)
 		ymb_encode((int16_t*)source,dest,length);
 	else if(adpcm_mode == 6)
 		aica_encode((int16_t*)source,dest,length);
+	else if(adpcm_mode == 7)
+		ima_encode((int16_t*)source,dest,length);
 	else
 		exit(-1);
 }
@@ -44,6 +47,8 @@ void decode(uint8_t *source,uint8_t *dest,long length,int adpcm_mode)
 		ymb_decode(source,(int16_t*)dest,length);
 	else if(adpcm_mode == 6)
 		aica_decode(source,(int16_t*)dest,length);
+	else if(adpcm_mode == 7)
+		ima_decode(source,(int16_t*)dest,length);
 	else
 		exit(-1);
 }
@@ -59,7 +64,7 @@ int main(int argc, char* argv [])
 
 	if(argc<4)
 	{
-		printf("Usage: <s|o|x|a|b|c|z><d|e> <file> <destination file> \n");
+		printf("Usage: <s|o|x|a|b|c|z|i><d|e> <file> <destination file> \n");
 		printf("List of codecs:\n");
 		printf("\ts - Brian Schmidt (BSMT2000 / QSound)\n");
 		printf("\to - Oki/Dialogic VOX (MSM6295)\n");
@@ -68,6 +73,7 @@ int main(int argc, char* argv [])
 		printf("\tb - Yamaha ADPCM-B (Y8950 / YM2608 / YM2610)\n");
 		printf("\tc - Yamaha AICA (AICA)\n");
 		printf("\tz - Yamaha / Creative (YMZ280B)\n");
+		printf("\ti - IMA ADPCM\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -141,6 +147,12 @@ int main(int argc, char* argv [])
 	{
 		adpcm_mode = 6;
 		printf("Using Yamaha AICA algorithm\n");
+		mode++;
+	}
+	else if(*mode == 'i')
+	{
+		adpcm_mode = 7;
+		printf("Using IMA ADPCM algorithm\n");
 		mode++;
 	}
 	else

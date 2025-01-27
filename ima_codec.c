@@ -34,7 +34,7 @@ static inline int16_t ima_step(uint8_t step, int16_t* history, uint8_t* step_his
 	};
 
 	uint16_t step_size = ima_step_table[*step_hist];
-	int16_t delta = step_size >> 3;
+	int32_t delta = step_size >> 3;
 	if(step & 1)
 		delta += step_size >> 2;
 	if(step & 2)
@@ -45,11 +45,11 @@ static inline int16_t ima_step(uint8_t step, int16_t* history, uint8_t* step_his
 		delta = -delta;
 
 #ifdef IMA_HIGHPASS
-	int32_t out = ((delta << 8) + (*history * 245)) >> 8;
+	int32_t out = CLAMP(((delta << 8) + ((int32_t)(*history) * 245)) >> 8, -32768, 32767);
 #else
-	int16_t out = *history + delta;
+	int32_t out = CLAMP((int32_t)(*history) + delta, -32768, 32767); // Saturate output
 #endif
-	*history = out = CLAMP(out, -32768, 32767); // Saturate output
+	*history = out;
 	int8_t adjusted_step = *step_hist + adjust_table[step & 7];
 	*step_hist = CLAMP(adjusted_step, 0, 88);
 
@@ -60,7 +60,7 @@ static inline uint8_t ima_encode_step(int16_t input, int16_t* history, uint8_t *
 {
 	int bit;
 	uint16_t step_size = ima_step_table[*step_hist];
-	int16_t delta = input - *history;
+	int32_t delta = input - *history;
 	uint8_t adpcm_sample = (delta < 0) ? 8 : 0;
 	delta = abs(delta);
 	for(bit=3; bit--; )
@@ -76,7 +76,7 @@ static inline uint8_t ima_encode_step(int16_t input, int16_t* history, uint8_t *
 	return adpcm_sample;
 }
 
-void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
+void dvi_encode(int16_t *buffer,uint8_t *outbuffer,long len)
 {
 	long i;
 
@@ -96,7 +96,27 @@ void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
 	}
 }
 
-void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len)
+void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
+{
+	long i;
+
+	int16_t history = 0;
+	uint8_t step_hist = 0;
+	uint8_t buf_sample = 0, nibble = 1;
+
+	for(i=0;i<len;i++)
+	{
+		int16_t sample = *buffer++;
+		int step = ima_encode_step(sample, &history, &step_hist);
+		if(!nibble)
+			*outbuffer++ = buf_sample | (step&15);
+		else
+			buf_sample = (step&15)<<4;
+		nibble^=1;
+	}
+}
+
+void dvi_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 {
 	long i;
 
@@ -109,6 +129,25 @@ void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 		int8_t step = (*(int8_t*)buffer) << nibble;
 		step >>= 4;
 		if(nibble)
+			buffer++;
+		nibble^=4;
+		*outbuffer++ = ima_step(step, &history, &step_hist);
+	}
+}
+
+void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len)
+{
+	long i;
+
+	int16_t history = 0;
+	uint8_t step_hist = 0;
+	uint8_t nibble = 4;
+
+	for(i=0;i<len;i++)
+	{
+		int8_t step = (*(int8_t*)buffer) << nibble;
+		step >>= 4;
+		if(!nibble)
 			buffer++;
 		nibble^=4;
 		*outbuffer++ = ima_step(step, &history, &step_hist);

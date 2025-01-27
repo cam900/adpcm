@@ -27,6 +27,8 @@ void encode(uint8_t *source,uint8_t *dest,long length,int adpcm_mode)
 		aica_encode((int16_t*)source,dest,length);
 	else if(adpcm_mode == 7)
 		ima_encode((int16_t*)source,dest,length);
+	else if(adpcm_mode == 8)
+		dvi_encode((int16_t*)source,dest,length);
 	else
 		exit(-1);
 }
@@ -49,6 +51,8 @@ void decode(uint8_t *source,uint8_t *dest,long length,int adpcm_mode)
 		aica_decode(source,(int16_t*)dest,length);
 	else if(adpcm_mode == 7)
 		ima_decode(source,(int16_t*)dest,length);
+	else if(adpcm_mode == 8)
+		dvi_decode(source,(int16_t*)dest,length);
 	else
 		exit(-1);
 }
@@ -64,7 +68,7 @@ int main(int argc, char* argv [])
 
 	if(argc<4)
 	{
-		printf("Usage: <s|o|x|a|b|c|z|i><d|e> <file> <destination file> \n");
+		printf("Usage: <s|o|x|a|b|c|z|i|d><d|e> <file> <destination file> \n");
 		printf("List of codecs:\n");
 		printf("\ts - Brian Schmidt (BSMT2000 / QSound)\n");
 		printf("\to - Oki/Dialogic VOX (MSM6295)\n");
@@ -74,6 +78,7 @@ int main(int argc, char* argv [])
 		printf("\tc - Yamaha AICA (AICA)\n");
 		printf("\tz - Yamaha / Creative (YMZ280B)\n");
 		printf("\ti - IMA ADPCM\n");
+		printf("\td - DVI IMA ADPCM\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -153,6 +158,12 @@ int main(int argc, char* argv [])
 	{
 		adpcm_mode = 7;
 		printf("Using IMA ADPCM algorithm\n");
+		mode++;
+	}
+	else if(*mode == 'd')
+	{
+		adpcm_mode = 8;
+		printf("Using DVI IMA ADPCM algorithm\n");
 		mode++;
 	}
 	else

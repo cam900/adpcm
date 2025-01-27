@@ -16,6 +16,7 @@
  * Output buffer should be at least (len/2) elements large.
  */
 void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len);
+void dvi_encode(int16_t *buffer,uint8_t *outbuffer,long len);
 
 /**
  * Given ADPCM samples in (buffer), return (len) amount of
@@ -23,5 +24,6 @@ void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len);
  * Output buffer should be at least (len*2) elements large.
  */
 void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len);
+void dvi_decode(uint8_t *buffer,int16_t *outbuffer,long len);
 
 #endif

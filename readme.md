@@ -28,6 +28,10 @@ ADPCM encoder/decoder.
 | xe      | Oki X68000 (MSM6258) | Encode |
 | zd      | Yamaha/Creative (YMZ280B) | Decode |
 | ze      | Yamaha/Creative (YMZ280B) | Encode |
+| id      | IMA ADPCM | Decode |
+| ie      | IMA ADPCM | Encode |
+| dd      | DVI IMA ADPCM | Decode |
+| de      | DVI IMA ADPCM | Encode |
 
 #### Library
 
@@ -38,6 +42,7 @@ ADPCM encoder/decoder.
 | yma_codec.[c/h] | yma_ | ADPCM-A |
 | ymb_codec.[c/h] | ymb_ | ADPCM-B |
 | ymz_codec.[c/h] | ymz_, aica_ | YMZ280B, AICA |
+| ima_codec.[c/h] | ima_, dvi_ | IMA ADPCM |
 
 #### Copyright
 

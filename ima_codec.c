@@ -96,26 +96,6 @@ void dvi_encode(int16_t *buffer,uint8_t *outbuffer,long len)
 	}
 }
 
-void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
-{
-	long i;
-
-	int16_t history = 0;
-	uint8_t step_hist = 0;
-	uint8_t buf_sample = 0, nibble = 1;
-
-	for(i=0;i<len;i++)
-	{
-		int16_t sample = *buffer++;
-		int step = ima_encode_step(sample, &history, &step_hist);
-		if(!nibble)
-			*outbuffer++ = buf_sample | (step&15);
-		else
-			buf_sample = (step&15)<<4;
-		nibble^=1;
-	}
-}
-
 void dvi_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 {
 	long i;
@@ -132,6 +112,26 @@ void dvi_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 			buffer++;
 		nibble^=4;
 		*outbuffer++ = ima_step(step, &history, &step_hist);
+	}
+}
+
+void ima_encode(int16_t *buffer,uint8_t *outbuffer,long len)
+{
+	long i;
+
+	int16_t history = 0;
+	uint8_t step_hist = 0;
+	uint8_t buf_sample = 0, nibble = 0;
+
+	for(i=0;i<len;i++)
+	{
+		int16_t sample = *buffer++;
+		int step = ima_encode_step(sample, &history, &step_hist);
+		if(nibble)
+			*outbuffer++ = buf_sample | ((step&15)<<4);
+		else
+			buf_sample = step&15;
+		nibble^=1;
 	}
 }
 

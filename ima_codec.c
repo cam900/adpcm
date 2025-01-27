@@ -106,7 +106,7 @@ void dvi_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 
 	for(i=0;i<len;i++)
 	{
-		int8_t step = (*(int8_t*)buffer) << nibble;
+		uint8_t step = (*buffer) << nibble;
 		step >>= 4;
 		if(nibble)
 			buffer++;
@@ -145,7 +145,7 @@ void ima_decode(uint8_t *buffer,int16_t *outbuffer,long len)
 
 	for(i=0;i<len;i++)
 	{
-		int8_t step = (*(int8_t*)buffer) << nibble;
+		uint8_t step = (*buffer) << nibble;
 		step >>= 4;
 		if(!nibble)
 			buffer++;
